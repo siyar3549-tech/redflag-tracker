@@ -1,0 +1,6 @@
+@FlaggedServer_HostAddress = http://localhost:5274
+
+GET {{FlaggedServer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
