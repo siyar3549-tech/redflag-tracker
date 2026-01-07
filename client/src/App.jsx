@@ -6,8 +6,11 @@ function App() {
   const [search, setSearch] = useState('');
   const [form, setForm] = useState({ username: '', redFlags: 5, comment: '' });
 
+  // Yeni Render Backend URL'in
+  const API_URL = 'https://redflag-tracker-1.onrender.com/api/UserReview';
+
   const fetchReviews = () => {
-    axios.get('http://localhost:5200/api/UserReview')
+    axios.get(API_URL)
       .then((res) => {
         setReviews(res.data || []);
       })
@@ -38,18 +41,17 @@ function App() {
     }
 
     try {
-      await axios.post('http://localhost:5200/api/UserReview', form);
+      await axios.post(API_URL, form);
       setForm({ username: '', redFlags: 5, comment: '' });
       fetchReviews();
     } catch (err) {
-      // Değişkeni burada kullanarak 'unused' uyarısını giderdik
       console.log("Bağlantı detayı:", err.message);
-      alert("Gönderilemedi, sunucu kapalı olabilir.");
+      alert("Gönderilemedi, sunucu uyanıyor olabilir. Lütfen 30 saniye sonra tekrar deneyin.");
     }
   };
 
   const gosterilecekListe = reviews
-    .filter(r => r.username.toLowerCase().includes(search.toLowerCase()))
+    .filter(r => r.username && r.username.toLowerCase().includes(search.toLowerCase()))
     .slice()
     .reverse();
 
