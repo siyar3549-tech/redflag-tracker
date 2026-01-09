@@ -6,7 +6,7 @@ function App() {
   const [search, setSearch] = useState('');
   const [form, setForm] = useState({ username: '', redFlags: 5, comment: '' });
 
-  // Yeni Render Backend URL'in
+  // Canlı Backend URL
   const API_URL = 'https://redflag-tracker-1.onrender.com/api/UserReview';
 
   const fetchReviews = () => {
@@ -46,12 +46,18 @@ function App() {
       fetchReviews();
     } catch (err) {
       console.log("Bağlantı detayı:", err.message);
-      alert("Gönderilemedi, sunucu uyanıyor olabilir. Lütfen 30 saniye sonra tekrar deneyin.");
+      alert("Gönderilemedi, sunucu uyanıyor olabilir.");
     }
   };
 
+  // İYİLEŞTİRME 2: Çöp verileri ("string" vb.) listeden gizle
   const gosterilecekListe = reviews
-    .filter(r => r.username && r.username.toLowerCase().includes(search.toLowerCase()))
+    .filter(r => {
+      const uName = (r.username || r.Username || "").toLowerCase();
+      const searchMatch = uName.includes(search.toLowerCase());
+      const isNotGarbage = uName !== "string" && uName.trim() !== "";
+      return searchMatch && isNotGarbage;
+    })
     .slice()
     .reverse();
 
@@ -117,10 +123,17 @@ function App() {
               background: 'rgba(255, 255, 255, 0.02)', padding: '20px', borderRadius: '18px', border: '1px solid rgba(255,255,255,0.05)'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontWeight: '700', color: '#ff416c' }}>{r.username}</span>
-                <span style={{ background: '#ff416c', padding: '2px 8px', borderRadius: '5px', fontSize: '0.7rem' }}>🚩 {r.redFlags}</span>
+                {/* İYİLEŞTİRME 1: r.username veya r.Username fark etmeksizin göster */}
+                <span style={{ fontWeight: '700', color: '#ff416c' }}>
+                  {r.username || r.Username || "Anonim"}
+                </span>
+                <span style={{ background: '#ff416c', padding: '2px 8px', borderRadius: '5px', fontSize: '0.7rem' }}>
+                  🚩 {r.redFlags || r.RedFlags || 0}
+                </span>
               </div>
-              <p style={{ color: '#ccc', marginTop: '10px' }}>{r.comment}</p>
+              <p style={{ color: '#ccc', marginTop: '10px' }}>
+                {r.comment || r.Comment || "Açıklama yok."}
+              </p>
             </div>
           ))}
         </div>
